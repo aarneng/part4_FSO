@@ -1,0 +1,24 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "filler data",
+  "author": ":)",
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "likes": 420
+}
+
+###
+GET http://localhost:3003/api/blogs
+###
+DELETE http://localhost:3003/api/blogs/60e84df2951d89809c80556d
+###
+PUT http://localhost:3003/api/blogs/60e842d3e61438372c10c771
+Content-Type: application/json
+
+{
+  "title": "updated data",
+  "author": ":)",
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "likes": 420
+}
