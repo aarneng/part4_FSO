@@ -3,11 +3,34 @@ const mongoose = require("mongoose")
 const supertest = require("supertest")
 const app = require("../app")
 const helper = require("./test_helper")
-// const Blog = require("../models/blogs")
+const bcrypt = require("bcrypt")
 
 const api = supertest(app)
 
 const Blog = require("../models/blogs")
+const User = require("../models/users")
+
+// const initialUsers = [
+//   {
+//     "username": "test man",
+//     "name": "admin",
+//     "password": "swag of chicken"
+//   },
+//   {
+//     "username": "the cooler test man",
+//     "name": "super admin",
+//     "password": "1234567891011121314151617181920"
+//   }
+// ]
+
+const initialUser = {
+  "username": "test man",
+  "name": "admin",
+  "password": "swag of chicken"
+}
+let user = {}
+let tokenObj = {}
+
 const initialBlogs = [
   {
     "title": "test",
@@ -31,9 +54,41 @@ const initialBlogs = [
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
+
+  // let finalUsers = []
+
+  // for (let i = 0; i < initialUsers.length; i++) {
+  //   const user = initialUsers[i]
+  //   const saltedRounds = 10
+  //   const hashedPassword = await bcrypt.hash(user.password, saltedRounds)
+  //   const finalUser = new User({
+  //     username: user.username,
+  //     name: user.name,
+  //     hashedPassword
+  //   })
+  //   await finalUser.save()
+  //   finalUsers.concat(finalUser)
+  // }
+  const saltedRounds = 10
+  const hashedPassword = await bcrypt.hash(initialUser.password, saltedRounds)
+  user = new User({
+      username: initialUser.username,
+      name: initialUser.name,
+      hashedPassword
+  })
+  await user.save()
+
+  tokenObj = await api.post("/api/login").send(initialUser)
+
   for (let blog of initialBlogs) {
+    
+    blog.user = user
     let blogObject = new Blog(blog)
     await blogObject.save()
+
+    user.blogs = user.blogs.concat(blogObject)
+    await user.save()
   }
 })
 
@@ -64,8 +119,9 @@ test("a valid blog can be added", async () => {
     url: "localhost",
     likes: Infinity
   }
-
-  await api.post("/api/blogs")
+  await api
+    .post("/api/blogs")
+    .set({Authorization: "Bearer " + tokenObj.body.token})
     .send(newBlog)
     .expect(200)
     .expect("content-type", /application\/json/)
@@ -121,7 +177,9 @@ test("unspecified title and/or URL respond with status 400", async () => {
     likes: Infinity
   }
 
-  await api.post("/api/blogs")
+  await api
+    .post("/api/blogs")
+    .set({Authorization: "Bearer " + tokenObj.body.token})
     .send(newBlogTitleMissing)
     .expect(400)
 
@@ -131,7 +189,9 @@ test("unspecified title and/or URL respond with status 400", async () => {
     likes: Infinity
   }
 
-  await api.post("/api/blogs")
+  await api
+    .post("/api/blogs")
+    .set({Authorization: "Bearer " + tokenObj.body.token})
     .send(newBlogURLMissing)
     .expect(400)
 })
@@ -142,6 +202,7 @@ test("deleting a blog post works", async () => {
   
   await api
     .delete(`/api/blogs/${toDelete.id}`)
+    .set({Authorization: "Bearer " + tokenObj.body.token})
     .expect(204)
   // await api.delete(`/api/blogs/${toDelete.id}`)
   

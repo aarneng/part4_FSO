@@ -8,24 +8,29 @@ const api = supertest(app)
 
 const User = require("../models/users")
 
+jest.setTimeout(20000);
+
 const initialUsers = [
   {
     "blogs":[],
     "username":"test",
     "name":"test man",
-    "id":"46115c69cfd39ecf2436087d"
+    "_id":"46115c69cfd39ecf2436087d",
+    "hashedPassword": "secret"
   },
   {
     "blogs":[],
     "username":"batman",
     "name":"bruce wayne",
-    "id":"60e8aacae63ae50fcc250730"
+    "id":"60e8aacae63ae50fcc250730",
+    "hashedPassword": "secret"
   },
   {
     "blogs":[],
     "username":"aarnenf",
     "name":"Aarni Haapaniemi",
-    "id":"645dea1846e63cf0d98c43bd"
+    "id":"645dea1846e63cf0d98c43bd",
+    "hashedPassword": "secret"
   },
 ]
 
@@ -59,10 +64,9 @@ test("the first user is a test user", async () => {
 
 test("a valid user can be added", async () => {
   const newUser = {
-    "blogs": [],
     "username":"not_batman",
     "name":"Wruce Bayne",
-    "id":"817702f138da67ec49cf6eb9"
+    "password":"secret"
   }
 
   await api.post("/api/users")
@@ -98,9 +102,8 @@ test("the field _id is undefined", async () => {
 
 test("unspecified username and/or password respond with status 400", async () => {
   const newUserusernameMissing = {
-    "blogs": [],
     "name":"Wruce Bayne",
-    "id":"817702f138da67ec49cf6eb9"
+    "password":"secret"
   }
 
   const usersBefore = await api.get("/api/users")
@@ -109,57 +112,83 @@ test("unspecified username and/or password respond with status 400", async () =>
     .send(newUserusernameMissing)
     .expect(400)
 
-  const newUserURLMissing = {
-    username: "new user",
-    author: "developer man",
-    likes: Infinity
+  const newUserPasswordMissing = {
+    "username":"not_batman",
+    "name":"Wruce Bayne"
   }
 
   await api.post("/api/users")
-    .send(newUserURLMissing)
+    .send(newUserPasswordMissing)
     .expect(400)
   
   const usersLater = await api.get("/api/users")
-  expect(usersLater).toBe(usersBefore)
+  expect(usersLater.body).toStrictEqual(usersBefore.body)
 })
 
-test("deleting a user post works", async () => {
-  const notesAtStart = await helper.usersInDB()
-  const toDelete = notesAtStart[0]
-  
-  await api
-    .delete(`/api/users/${toDelete.id}`)
-    .expect(204)
-  // await api.delete(`/api/users/${toDelete.id}`)
-  
-  const notesAtEnd = await helper.usersInDB()
+test("bad username and/or password respond appropreately", async () => {
+  const usersBefore = await api.get("/api/users")
 
-  expect(notesAtEnd).toHaveLength(notesAtStart.length - 1)
-
-  const usernames = notesAtEnd.map(r => r.username)
-  expect(usernames[0]).not.toContain(toDelete.username)
-})
-
-test("updating a user post works", async () => {
-  const newUser = {
-    username: "new user",
-    author: "developer man",
-    url: "localhost",
-    likes: Infinity
+  const newUserBadUsername = {
+    "username":"12",
+    "name":"Wruce Bayne",
+    "password":"secret"
   }
 
-  const notesAtStart = await helper.usersInDB()
-  const toUpdate = notesAtStart[0]
-  await api.put(`/api/users/${toUpdate.id}`)
-    .send(newUser)
-    .expect(200)
+  await api.post("/api/users")
+    .send(newUserBadUsername)
+    .expect(400)
+
+  const newUserBadPassword = {
+    "username":"not_batman",
+    "name":"Wruce Bayne",
+    "password":"12"
+  }
+
+  await api.post("/api/users")
+    .send(newUserBadPassword)
+    .expect(400)
   
-  const notesAtEnd = await helper.usersInDB()
-
-  expect(notesAtEnd).toHaveLength(notesAtStart.length)
-
-  expect(notesAtStart[0].username).not.toBe(notesAtEnd[0].username)
+  const usersLater = await api.get("/api/users")
+  expect(usersLater.body).toStrictEqual(usersBefore.body)
 })
+
+// test("deleting a user works", async () => {
+//   const notesAtStart = await helper.usersInDB()
+//   const toDelete = notesAtStart[0]
+  
+//   await api
+//     .delete(`/api/users/${toDelete.id}`)
+//     .expect(204)
+//   // await api.delete(`/api/users/${toDelete.id}`)
+  
+//   const notesAtEnd = await helper.usersInDB()
+
+//   expect(notesAtEnd).toHaveLength(notesAtStart.length - 1)
+
+//   const usernames = notesAtEnd.map(r => r.username)
+//   expect(usernames[0]).not.toContain(toDelete.username)
+// })
+
+// test("updating a user works", async () => {
+//   const newUser = {
+//     username: "new user",
+//     author: "developer man",
+//     url: "localhost",
+//     likes: Infinity
+//   }
+
+//   const notesAtStart = await helper.usersInDB()
+//   const toUpdate = notesAtStart[0]
+//   await api.put(`/api/users/${toUpdate.id}`)
+//     .send(newUser)
+//     .expect(200)
+  
+//   const notesAtEnd = await helper.usersInDB()
+
+//   expect(notesAtEnd).toHaveLength(notesAtStart.length)
+
+//   expect(notesAtStart[0].username).not.toBe(notesAtEnd[0].username)
+// })
 
 
 
