@@ -6,6 +6,7 @@ const User = require("../models/users")
 function requestLogger(request, response, next) {
   logger.info("Method:", request.method)
   logger.info("Path:  ", request.path)
+  logger.info("time:  ", new Date())
   logger.info("Body:  ", request.body)
   logger.info("-".repeat(20))
   next()

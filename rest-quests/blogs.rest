@@ -3,10 +3,10 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJhdG1hbiIsImlkIjoiNjBlOGE3MzhkYzVmMTQ2MDE4MDU1OGVmIiwiaWF0IjoxNjI2MzQ3MTgyLCJleHAiOjE2MjY5NTE5ODJ9.pZBbZMQyHeP5ghJAYfASof3g_xC-yQLbxNOAFLnUsP0
 
 {
-  "title": "coolest blog",
-  "author": ":)",
-  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  "likes": 420
+  "title": "whoa",
+  "author": "joker",
+  "url": "google en passant",
+  "likes": 69
 }
 
 ###
@@ -35,16 +35,16 @@ Authorization: Bearer eyJhbGciOi
 ###
 GET http://localhost:3003/api/blogs
 ###
-DELETE http://localhost:3003/api/blogs/60f02b4618858f12aebf2fda
+DELETE http://localhost:3003/api/blogs/60f8146c0f350c1df8b3c188
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImJhdG1hbiIsImlkIjoiNjBlOGE3MzhkYzVmMTQ2MDE4MDU1OGVmIiwiaWF0IjoxNjI2MzQ3MTgyLCJleHAiOjE2MjY5NTE5ODJ9.pZBbZMQyHeP5ghJAYfASof3g_xC-yQLbxNOAFLnUsP0
 
 ###
-PUT http://localhost:3003/api/blogs/60e842d3e61438372c10c771
+PUT http://localhost:3003/api/blogs/60f81e504853fd1f85d80eef
 Content-Type: application/json
 
 {
-  "title": "updated data",
+  "title": "updated data 2",
   "author": ":)",
   "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  "likes": 420
+  "likes": 69
 }
