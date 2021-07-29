@@ -1,8 +1,8 @@
 const blogRouter = require('express').Router()
 const Blog = require("../models/blogs")
-const User = require("../models/users")
-const jwt = require("jsonwebtoken")
-const logger = require("../utils/logger")
+// const User = require("../models/users")
+// const jwt = require("jsonwebtoken")
+// const logger = require("../utils/logger")
 const middleware = require("./../utils/middleware")
 
 
@@ -14,29 +14,18 @@ blogRouter.get('/', async (request, response) => {
 
 blogRouter.post('/', middleware.userExtractor, async (request, response) => {
 
-  // const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  
-  // if (!decodedToken.id) {
-  //   return response.status(401).json({error: "missing or invalid token"})
-  // }
-
   const user = request.user
+  const blog = new Blog (request.body)
 
-  const b = request.body
-  const blog = new Blog ({
-    title: b.title,
-    url: b.url,
-    author: b.author,
-    likes: b.likes || 0,
-    user: user
-  })
+  blog.likes = blog.likes || 0
+  blog.user = user
 
   const res = await blog.save()
 
-  user.blogs = user.blogs.concat(res)
+  user.blogs = user.blogs.concat(res._id)
   await user.save()
 
-  response.json(res)
+  response.status(201).json(res)
 })
 
 blogRouter.delete("/:id", middleware.userExtractor, async (request, response) => {

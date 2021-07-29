@@ -1,4 +1,5 @@
-/* eslint-disable no-undef */
+/* eslint-disable no-undef*/
+/* eslint-disable no-unused-vars */
 const mongoose = require("mongoose")
 const supertest = require("supertest")
 const app = require("../app")
@@ -8,7 +9,7 @@ const api = supertest(app)
 
 const User = require("../models/users")
 
-jest.setTimeout(20000);
+jest.setTimeout(20000)
 
 const initialUsers = [
   {

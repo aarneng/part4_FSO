@@ -6,14 +6,15 @@ const User = require("../models/users")
 function requestLogger(request, response, next) {
   logger.info("Method:", request.method)
   logger.info("Path:  ", request.path)
-  logger.info("time:  ", new Date())
+  logger.info("Time:  ", new Date())
   logger.info("Body:  ", request.body)
+  logger.info("Full request: ", request.get('host') + request.originalUrl)
   logger.info("-".repeat(20))
   next()
 }
 
 function errorHandler(error, request, response, next) {
-  logger.error(error.name, error.message)
+  logger.error(error.name, error.message, error)
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "Malformatted ID" })
