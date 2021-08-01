@@ -22,8 +22,23 @@ blogRouter.post('/', middleware.userExtractor, async (request, response) => {
 
   const res = await blog.save()
 
-  user.blogs = user.blogs.concat(res._id)
-  await user.save()
+  // console.log("user", "\n", "------------------------", "\n")
+  // console.log(user)
+  // console.log("blog", "\n", "------------------------", "\n")
+  // console.log(blog)
+  // console.log("response", "\n", "------------------------", "\n")
+  // console.log(res)
+
+  // delete res.__v
+
+  const id = await res._id
+  // console.log("IDS ARE THE SAME?", id == res._id)
+  // console.log("IDS ARE NOT THE SAME?", id == user._id)
+  
+  // sleep(2000)
+
+  user.blogs = user.blogs.concat(id)
+  await user.update()
 
   response.status(201).json(res)
 })
